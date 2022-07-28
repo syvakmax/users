@@ -1,0 +1,21 @@
+<div class="container p-4 mx-auto my-4">
+    <div *ngIf="user">
+        <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        <p><strong>Role:</strong> {{user.role}}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Birth Date:</strong> {{ user.birthDate }}</p>
+    <div>
+        <div class="flex space-x-2">
+        <button mat-raised-button (click)="editUserModal($event)">
+            <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-raised-button (click)="deleteUser($event)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+</div>
+
+<app-edit-user-modal [activeUser]="user"></app-edit-user-modal>
+
+

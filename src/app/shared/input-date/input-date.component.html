@@ -1,0 +1,8 @@
+<mat-form-field class="w-full">
+    <mat-label>{{ label }}</mat-label>
+    <input [formControl]="control"
+        matInput type="text" [name]="name" [value]="value"
+        placeholder="MM/DD/YYYY"
+        onfocus="(this.type='date')"
+        onblur="(this.type='text')">
+</mat-form-field>

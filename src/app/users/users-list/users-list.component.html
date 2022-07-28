@@ -1,0 +1,41 @@
+<!-- Users Lists -->
+<section class="container p-4 mx-auto my-4 relative">
+    <div class="flex flex-row justify-between px-1 mb-2">
+        <h1 class="text-4xl">Users</h1>
+    </div>
+    <div class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <mat-card *ngFor="let user of users">
+            <mat-card-title>{{user.firstName}} {{ user.lastName }}</mat-card-title>
+            <mat-card-subtitle>{{ user.role }}</mat-card-subtitle>
+            <mat-card-content>{{ user.email }}</mat-card-content>
+            <mat-card-content>
+                <a [routerLink]="['/user', user.id]" class="text-blue-900">View details</a>
+            </mat-card-content>
+            <div class="flex space-x-2">
+                <button mat-raised-button class="hover:bg-blue-500 hover:text-white"
+                    (click)="editUserModal($event, user)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-raised-button class="hover:bg-red-500 hover:text-white"
+                    (click)="deleteUser($event, user)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </mat-card>
+    </div>
+
+    <div class="text-center my-4">
+        <button mat-raised-button color="primary" (click)="loadMore()">Load more</button>
+    </div>
+    <div class="sticky bottom-10 float-right mr-4 z-100">
+        <button (click)="addUserModal($event)"
+             mat-fab color="accent" aria-label="Add new user">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
+</section>
+
+
+
+<app-add-user-modal></app-add-user-modal>
+<app-edit-user-modal [activeUser]="activeUser"></app-edit-user-modal>
