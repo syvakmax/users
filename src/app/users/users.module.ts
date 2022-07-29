@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AddUserModalComponent } from './add-user-modal/add-user-modal.component';
 import { SharedModule } from '../shared/shared.module';
 import { FormComponent } from './form/form.component';
-import { MatInput, MatInputModule } from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {MatSelectModule} from '@angular/material/select';
 

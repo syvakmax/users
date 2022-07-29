@@ -20,29 +20,12 @@ export class UserService {
     this.users$ = this.usersCollection.valueChanges();
   }
 
-  getUsers() {
+  getAllUsers() {
     return this.users$
   }
 
-  getUsersSorted(sort$: BehaviorSubject<string>, numUsersLoaded$: BehaviorSubject<number>) {
-    return combineLatest([
-      sort$,
-      numUsersLoaded$
-    ]).pipe(
-      switchMap(values => {
-        const [sort, numUsersLoaded] = values
-        const query = this.usersCollection.ref.orderBy(
-          'id', sort === '1' ? 'desc' : 'asc'
-        ).limit(numUsersLoaded)
-        return query.get()
-      }),
-      map(snapshot => {
-        return (snapshot as QuerySnapshot<IUser>).docs
-      })
-    )
-  }
-
-  getUsersSorted2(sort$: BehaviorSubject<string>, numUsersLoaded$: BehaviorSubject<number>, loadLimit: number, lastUserId$: BehaviorSubject<number>) {
+  getUsersSorted(sort$: BehaviorSubject<string>, numUsersLoaded$: BehaviorSubject<number>, 
+                  loadLimit: number, lastUserId$: BehaviorSubject<number>) {
     return combineLatest([
       sort$,
       numUsersLoaded$,
@@ -54,18 +37,15 @@ export class UserService {
           const query = this.usersCollection.ref.orderBy(
             'id', sort === '1' ? 'desc' : 'asc'
           ).limit(numUsersLoaded)
-          console.log('1 cond')
           return query.get()
         } else {
           const query = this.usersCollection.ref.orderBy(
             'id', sort === '1' ? 'desc' : 'asc'
           ).startAfter(lastUserId).limit(loadLimit)
-          console.log('2 cond')
           return query.get()
         }
       }),
       map(snapshot => {
-        console.log((snapshot as QuerySnapshot<IUser>).docs)
         return (snapshot as QuerySnapshot<IUser>).docs
       })
     )

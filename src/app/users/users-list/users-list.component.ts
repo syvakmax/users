@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable, map, BehaviorSubject } from 'rxjs';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { ModalService } from 'src/app/services/modal.service';
 import { UserService } from 'src/app/services/user.service';
 
-import { users, IUser } from '../users';
+import { IUser } from '../users';
 
 @Component({
   selector: 'app-users-list',
@@ -17,6 +17,8 @@ export class UsersListComponent implements OnInit {
   loadLimit = 12
   numUsersLoaded = this.loadLimit
 
+  usersOrder = '1'
+
   activeUser: IUser | null = null
 
   sort$: BehaviorSubject<string>
@@ -25,15 +27,17 @@ export class UsersListComponent implements OnInit {
 
   constructor(
     private modal: ModalService,
-    private userService: UserService
+    private userService: UserService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
-    this.sort$ = new BehaviorSubject('1')
+    this.sort$ = new BehaviorSubject(this.usersOrder)
     this.numUsersLoaded$ = new BehaviorSubject(this.loadLimit)
     this.lastUserId$ = new BehaviorSubject(0)
-   }
+  }
 
   ngOnInit(): void {
-    /*this.userService.getUsers().subscribe({
+    /*this.userService.getAllUsers().subscribe({
       next: (users) => {
         this.users = users
         console.log(this.users)
@@ -51,13 +55,18 @@ export class UsersListComponent implements OnInit {
     })
     */
 
-    this.userService.getUsersSorted2(
-        this.sort$, this.numUsersLoaded$, 
-        this.loadLimit, this.lastUserId$
-      ).subscribe(docs => {
+    this.userService.getUsersSorted(
+      this.sort$, this.numUsersLoaded$,
+      this.loadLimit, this.lastUserId$
+    ).subscribe(docs => {
       docs.forEach(doc => {
         this.users.push(doc.data())
       })
+    })
+
+    this.route.queryParams.subscribe((params: Params) => {
+      this.usersOrder = params.sort === '2' ? '2' : '1'
+      this.sort$.next(this.usersOrder)
     })
   }
 
@@ -78,7 +87,7 @@ export class UsersListComponent implements OnInit {
 
     this.userService.deleteUser(user)
 
-    this.users.forEach((u, i)=> {
+    this.users.forEach((u, i) => {
       if (u.id === user.id) {
         this.users.splice(i, 1)
         this.numUsersLoaded -= 1
@@ -86,8 +95,7 @@ export class UsersListComponent implements OnInit {
     })
   }
 
-  onScroll($event: any) {
-    console.log("scrolled down!!", $event);
+  onScroll() {
     this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id)
     this.numUsersLoaded += 6
     this.numUsersLoaded$.next(this.numUsersLoaded)
@@ -97,6 +105,19 @@ export class UsersListComponent implements OnInit {
     this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id)
     this.numUsersLoaded += 6
     this.numUsersLoaded$.next(this.numUsersLoaded)
+  }
+
+  sort($event: Event) {
+    const { value } = $event.target as HTMLSelectElement;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sort: value
+      }
+    })
+    this.lastUserId$.next(0)
+    this.numUsersLoaded$.next(this.loadLimit)
+    this.users = []
   }
 
 }

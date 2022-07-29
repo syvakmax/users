@@ -2,11 +2,16 @@
 <section class="container p-4 mx-auto my-4 relative">
     <div class="flex flex-row justify-between px-1 mb-2">
         <h1 class="text-4xl">Users</h1>
+        <select (change)="sort($event)"
+            class="text-black px-8 text-xl outline-none appearance-none">
+            <option value="1" [selected]="usersOrder === '1'">Recent Users</option>
+            <option value="2" [selected]="usersOrder === '2'">Oldest Users</option>
+        </select>
     </div>
     <div infiniteScroll
         [infiniteScrollDistance]="2"
         [infiniteScrollThrottle]="50"
-        (scrolled)="onScroll($event)"
+        (scrolled)="onScroll()"
         class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <mat-card *ngFor="let user of users">
             <mat-card-title>{{user.firstName}} {{ user.lastName }}</mat-card-title>

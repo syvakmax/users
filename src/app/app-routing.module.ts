@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 import { FormComponent } from './users/form/form.component';
 import { UserDetailsComponent } from './users/user-details/user-details.component';
 
@@ -11,13 +12,10 @@ const routes: Routes = [
     component: HomeComponent
   },
   {
-    path: 'form',
-    component: FormComponent
-  },
-  {
     path: 'user/:id',
     component: UserDetailsComponent
-  }
+  },
+  { path: '**', component: NotFoundComponent }
 ];
 
 @NgModule({
