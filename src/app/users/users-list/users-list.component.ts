@@ -86,6 +86,13 @@ export class UsersListComponent implements OnInit {
     })
   }
 
+  onScroll($event: any) {
+    console.log("scrolled down!!", $event);
+    this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id)
+    this.numUsersLoaded += 6
+    this.numUsersLoaded$.next(this.numUsersLoaded)
+  }
+
   loadMore() {
     this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id)
     this.numUsersLoaded += 6

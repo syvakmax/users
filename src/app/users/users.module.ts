@@ -16,6 +16,7 @@ import { UserDetailsComponent } from './user-details/user-details.component';
 
 import {RouterModule} from '@angular/router';
 import { EditUserModalComponent } from './edit-user-modal/edit-user-modal.component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { EditUserModalComponent } from './edit-user-modal/edit-user-modal.compon
     MatIconModule,
     MatInputModule,
     MatDatepickerModule,
-    MatSelectModule
+    MatSelectModule,
+    InfiniteScrollModule
   ],
   exports: [
     UsersListComponent,

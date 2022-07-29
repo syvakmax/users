@@ -15,6 +15,8 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from 'src/environments/environment';
 
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+
 
 @NgModule({
   declarations: [
@@ -31,6 +33,7 @@ import { environment } from 'src/environments/environment';
     MatToolbarModule,
     UsersModule,
     SharedModule,
+    InfiniteScrollModule
   ],
   providers: [],
   bootstrap: [AppComponent]
