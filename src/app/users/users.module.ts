@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AddUserModalComponent } from './add-user-modal/add-user-modal.component';
 import { SharedModule } from '../shared/shared.module';
-import { FormComponent } from './form/form.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {MatSelectModule} from '@angular/material/select';
@@ -23,7 +22,6 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
   declarations: [
     UsersListComponent,
     AddUserModalComponent,
-    FormComponent,
     UserDetailsComponent,
     EditUserModalComponent
   ],
