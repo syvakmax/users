@@ -1,13 +1,13 @@
 <app-modal modalID="add-user">
     <div class="absolute z-100 top-1/2 left-1/2 
-                -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-6 w-96 rounded">
+                -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-6 w-80 sm:x-96 rounded">
         <div class="flex justify-between px-2">
             <h2>Add a new user</h2>
             <mat-icon class="mt-1 mr-1 cursor-pointer" (click)="modal.toggleModal('add-user')">close</mat-icon>
         </div>
         <app-alert *ngIf="showAlert" [color]="alertColor">{{ alertMsg }}</app-alert>
 
-        <div class="container mx-auto mt-2 mb-3 px-2">
+        <div class="container mx-auto mt-2 mb-3 px-2 max-w-xs">
 
             <form [formGroup]="addUserForm" (ngSubmit)="addNewUser()"
                  class="flex flex-col">
