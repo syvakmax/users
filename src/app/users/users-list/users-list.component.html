@@ -51,4 +51,4 @@
 
 
 <app-add-user-modal></app-add-user-modal>
-<app-edit-user-modal [activeUser]="activeUser"></app-edit-user-modal>
+<app-edit-user-modal [activeUser]="activeUser" (editUser)="updateUser($event)"></app-edit-user-modal>

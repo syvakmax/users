@@ -1,9 +1,10 @@
 import { InvokeFunctionExpr } from '@angular/compiler';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { ModalService } from 'src/app/services/modal.service';
 import { IUser } from '../users';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserService } from 'src/app/services/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -13,6 +14,7 @@ import { UserService } from 'src/app/services/user.service';
 export class EditUserModalComponent implements OnInit, OnChanges {
 
   @Input() activeUser: IUser | null = null
+  @Output() editUser: EventEmitter<IUser> = new EventEmitter
 
   firstName = new FormControl('', {
     validators: [
@@ -52,7 +54,8 @@ export class EditUserModalComponent implements OnInit, OnChanges {
 
   constructor(
     public modal: ModalService,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -78,16 +81,18 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     this.showAlert = true
     this.alertColor = 'blue'
     this.alertMsg = 'Please wait. Updating user.'
+
+    const updatedUser = {
+      id: this.activeUser.id,
+      firstName: this.firstName.value as string,
+      lastName: this.lastName.value as string,
+      email: this.email.value as string,
+      birthDate: this.birthDate.value as string,
+      role: this.role.value as string
+    }
     try {
-      const updatedUser = {
-        id: this.activeUser.id,
-        firstName: this.firstName.value as string,
-        lastName: this.lastName.value as string,
-        email: this.email.value as string,
-        birthDate: this.birthDate.value as string,
-        role: this.role.value as string
-      }
       await this.userService.updateUser(this.activeUser.id.toString(), updatedUser)
+      this.editUser.emit(updatedUser)
     }
     catch (err) {
       this.inSubmission = false
@@ -104,6 +109,9 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     setTimeout(() => {
       this.modal.toggleModal('edit-user')
     }, 1000)
+    setTimeout(() => {
+      this.router.navigate(['user', updatedUser.id])
+    }, 1200)
   }
 
 }

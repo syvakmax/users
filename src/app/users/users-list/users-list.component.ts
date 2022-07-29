@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { ModalService } from 'src/app/services/modal.service';
@@ -16,11 +16,9 @@ export class UsersListComponent implements OnInit {
   users: IUser[] = []
   loadLimit = 12
   numUsersLoaded = this.loadLimit
-
   usersOrder = '1'
-
   activeUser: IUser | null = null
-
+  
   sort$: BehaviorSubject<string>
   numUsersLoaded$: BehaviorSubject<number>
   lastUserId$: BehaviorSubject<number>
@@ -118,6 +116,14 @@ export class UsersListComponent implements OnInit {
     this.lastUserId$.next(0)
     this.numUsersLoaded$.next(this.loadLimit)
     this.users = []
+  }
+
+  updateUser($user: IUser) {
+    this.users.forEach(user => {
+      if (user.id === $user.id) {
+        user = $user
+      }
+    })
   }
 
 }
