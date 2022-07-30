@@ -100,12 +100,14 @@ export class UsersListComponent implements OnInit {
   }
 
   loadMore() {
+    console.log(this.numUsersLoaded)
     this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id)
     this.numUsersLoaded += 6
     this.numUsersLoaded$.next(this.numUsersLoaded)
   }
 
   sort($event: Event) {
+    this.users = []
     const { value } = $event.target as HTMLSelectElement;
     this.router.navigate([], {
       relativeTo: this.route,
@@ -113,9 +115,10 @@ export class UsersListComponent implements OnInit {
         sort: value
       }
     })
+    this.numUsersLoaded = this.loadLimit
+    this.numUsersLoaded$.next(this.numUsersLoaded)
     this.lastUserId$.next(0)
-    this.numUsersLoaded$.next(this.loadLimit)
-    this.users = []
+    this.numUsersLoaded$.subscribe(console.log)
   }
 
   updateUser($user: IUser) {
