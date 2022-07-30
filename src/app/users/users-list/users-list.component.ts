@@ -100,7 +100,6 @@ export class UsersListComponent implements OnInit {
   }
 
   loadMore() {
-    console.log(this.numUsersLoaded)
     this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id)
     this.numUsersLoaded += 6
     this.numUsersLoaded$.next(this.numUsersLoaded)

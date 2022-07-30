@@ -58,11 +58,13 @@ export class AddUserModalComponent implements OnInit {
     this.modal.unregister('add-user')
   }
 
+  inSubmission = false
   showAlert = false
   alertColor = 'blue'
   alertMsg = 'Adding a new user'
 
   async addNewUser() {
+    this.inSubmission = true
     this.showAlert = true
     this.alertColor = 'blue'
     this.alertMsg = 'Adding a new user'
@@ -79,12 +81,14 @@ export class AddUserModalComponent implements OnInit {
         role: this.role.value,
       })
     } catch(err) {
+      this.inSubmission = false
       this.alertColor = 'red'
       this.alertMsg = 'An unexpected error occured. Please try again later'
       console.error(err)
       return
     }
 
+    this.inSubmission = false
     this.alertColor = 'green'
     this.alertMsg = 'Success! New user has been added'
     setTimeout(() => {

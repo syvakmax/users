@@ -18,7 +18,7 @@
                 </app-input-date>
                 <app-input-select [control]="role" [options]="['Admin','Manager','User']">
                 </app-input-select>
-                <button type="submit" color="primary" mat-raised-button [disabled]="editForm.invalid">Submit</button>
+                <button type="submit" color="primary" mat-raised-button [disabled]="editForm.invalid || inSubmission">Submit</button>
             </form>
         </div>
 
