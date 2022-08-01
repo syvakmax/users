@@ -36,7 +36,7 @@ export class UserService {
         if (numUsersLoaded <= loadLimit) {
           const query = this.usersCollection.ref.orderBy(
             'id', sort === '1' ? 'desc' : 'asc'
-          ).limit(numUsersLoaded)
+          ).limit(loadLimit)
           return query.get()
         } else {
           const query = this.usersCollection.ref.orderBy(

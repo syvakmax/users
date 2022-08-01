@@ -12,6 +12,7 @@
             <mat-icon *ngIf="usersOrder === '2'">arrow_downward</mat-icon>  
         </div>
     </div>
+
     <div infiniteScroll
         [infiniteScrollDistance]="2"
         [infiniteScrollThrottle]="50"
@@ -40,6 +41,7 @@
     <div class="text-center my-4">
         <button mat-raised-button color="primary" (click)="loadMore()">Load more</button>
     </div>
+    
     <div class="sticky bottom-10 float-right mr-4 z-100">
         <button (click)="addUserModal($event)"
              mat-fab color="accent" aria-label="Add new user">

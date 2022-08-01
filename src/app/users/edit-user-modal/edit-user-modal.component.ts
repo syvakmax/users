@@ -82,7 +82,7 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     this.alertColor = 'blue'
     this.alertMsg = 'Please wait. Updating user.'
 
-    const updatedUser = {
+    const updatedUser: IUser = {
       id: this.activeUser.id,
       firstName: this.firstName.value as string,
       lastName: this.lastName.value as string,

@@ -117,14 +117,11 @@ export class UsersListComponent implements OnInit {
     this.numUsersLoaded = this.loadLimit
     this.numUsersLoaded$.next(this.numUsersLoaded)
     this.lastUserId$.next(0)
-    this.numUsersLoaded$.subscribe(console.log)
   }
 
   updateUser($user: IUser) {
-    this.users.forEach(user => {
-      if (user.id === $user.id) {
-        user = $user
-      }
+    this.users.filter(user => {
+      user.id !== $user.id
     })
   }
 
