@@ -1,0 +1,24 @@
+<mat-card>
+  <mat-card-title>{{ user.firstName }} {{ user.lastName }}</mat-card-title>
+  <mat-card-subtitle>{{ user.role }}</mat-card-subtitle>
+  <mat-card-content>{{ user.email }}</mat-card-content>
+  <mat-card-content>
+    <a [routerLink]="['/user', user.id]" class="text-blue-900">View details</a>
+  </mat-card-content>
+  <div class="flex space-x-2">
+    <button
+      mat-raised-button
+      class="hover:bg-blue-500 hover:text-white"
+      (click)="editUser.emit(user)"
+    >
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button
+      mat-raised-button
+      class="hover:bg-red-500 hover:text-white"
+      (click)="deleteUser.emit(user)"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</mat-card>

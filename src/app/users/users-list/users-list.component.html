@@ -1,56 +1,55 @@
 <!-- Users Lists -->
 <section class="container p-4 mx-auto my-4 relative">
-    <div class="flex flex-row justify-between px-1 mb-2">
-        <h1 class="text-4xl">Users</h1>
-        <div class="flex items-center text-gray-600 mb-4">     
-            <select (change)="sort($event)"
-                class="text-gray-800 px-1 text-xl cursor-pointer outline-none appearance-none">
-                <option value="1" [selected]="usersOrder === '1'">Recent Users</option>
-                <option value="2" [selected]="usersOrder === '2'">Oldest Users</option>
-            </select>
-            <mat-icon *ngIf="usersOrder === '1'">arrow_upward</mat-icon>
-            <mat-icon *ngIf="usersOrder === '2'">arrow_downward</mat-icon>  
-        </div>
+  <div class="flex flex-row justify-between px-1 mb-2">
+    <h1 class="text-4xl">Users</h1>
+    <div class="flex items-center text-gray-600 mb-4">
+      <select
+        (change)="sort($event)"
+        class="text-gray-800 px-1 text-xl cursor-pointer outline-none appearance-none"
+      >
+        <option value="1" [selected]="usersOrder === '1'">Recent Users</option>
+        <option value="2" [selected]="usersOrder === '2'">Oldest Users</option>
+      </select>
+      <mat-icon *ngIf="usersOrder === '1'">arrow_upward</mat-icon>
+      <mat-icon *ngIf="usersOrder === '2'">arrow_downward</mat-icon>
     </div>
+  </div>
 
-    <div infiniteScroll
-        [infiniteScrollDistance]="2"
-        [infiniteScrollThrottle]="50"
-        (scrolled)="onScroll()"
-        class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <mat-card *ngFor="let user of users">
-            <mat-card-title>{{user.firstName}} {{ user.lastName }}</mat-card-title>
-            <mat-card-subtitle>{{ user.role }}</mat-card-subtitle>
-            <mat-card-content>{{ user.email }}</mat-card-content>
-            <mat-card-content>
-                <a [routerLink]="['/user', user.id]" class="text-blue-900">View details</a>
-            </mat-card-content>
-            <div class="flex space-x-2">
-                <button mat-raised-button class="hover:bg-blue-500 hover:text-white"
-                    (click)="editUserModal($event, user)">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-raised-button class="hover:bg-red-500 hover:text-white"
-                    (click)="deleteUser($event, user)">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </div>
-        </mat-card>
-    </div>
+  <div
+    infiniteScroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="50"
+    (scrolled)="onScroll()"
+    class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+  >
+    <app-user-card
+      *ngFor="let user of users$ | async; trackBy: trackByFn"
+      [user]="user"
+      (editUser)="openDialogEdit(user)"
+      (deleteUser)="openDialogDelete(user)"
+    >
+    </app-user-card>
+  </div>
 
-    <div class="text-center my-4">
-        <button mat-raised-button color="primary" (click)="loadMore()">Load more</button>
-    </div>
-    
-    <div class="sticky bottom-10 float-right mr-4 z-100">
-        <button (click)="addUserModal($event)"
-             mat-fab color="accent" aria-label="Add new user">
-            <mat-icon>add</mat-icon>
-        </button>
-    </div>
+  <div class="text-center my-4">
+    <button mat-raised-button color="primary" (click)="loadMore()">
+      Load more
+    </button>
+  </div>
+
+  <div class="sticky bottom-10 float-right mr-4 z-100">
+    <button
+      (click)="openDialogAdd()"
+      mat-fab
+      color="accent"
+      aria-label="Add new user"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
 </section>
 
-
-
-<app-add-user-modal></app-add-user-modal>
-<app-edit-user-modal [activeUser]="activeUser" (editUser)="updateUser($event)"></app-edit-user-modal>
+<!--<app-edit-user-modal
+  [activeUser]="activeUser"
+  (editUser)="updateUser($event)"
+></app-edit-user-modal>-->

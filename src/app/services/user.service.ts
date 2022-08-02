@@ -33,6 +33,24 @@ export class UserService {
     ]).pipe(
       switchMap(values => {
         const [sort, numUsersLoaded, lastUserId] = values
+
+        // let query = this.usersCollection.ref.orderBy(
+        //   'id', sort === '1' ? 'desc' : 'asc'
+        // );
+
+        // if (numUsersLoaded > loadLimit) {
+        //   query = query.startAfter(lastUserId)
+        // };
+
+        // query = query.limit(loadLimit);
+
+        // return query.get();
+
+        // const query = this.usersCollection.ref.orderBy(
+        //   'id', sort === '1' ? 'desc' : 'asc'
+        // ).startAt(0).limit(loadLimit);
+        // return query.get();
+
         if (numUsersLoaded <= loadLimit) {
           const query = this.usersCollection.ref.orderBy(
             'id', sort === '1' ? 'desc' : 'asc'
