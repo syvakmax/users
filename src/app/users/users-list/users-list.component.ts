@@ -12,6 +12,7 @@ import { IUser } from "../users";
 import { DeleteUserModalComponent } from "../delete-user-modal/delete-user-modal.component";
 import { AddUserModalComponent } from "../add-user-modal/add-user-modal.component";
 import { EditUserModalComponent } from "../edit-user-modal/edit-user-modal.component";
+import { StorageService } from "src/app/services/storage.service";
 
 @Component({
   selector: "app-users-list",
@@ -21,72 +22,24 @@ import { EditUserModalComponent } from "../edit-user-modal/edit-user-modal.compo
 })
 export class UsersListComponent implements OnInit {
   users$: BehaviorSubject<IUser[]>;
-
   users2$: Observable<IUser[]>;
-  page$: BehaviorSubject<number>;
-  pageCounter = 1;
-
-  users: IUser[] = [];
-  loadLimit = 3;
-  numUsersLoaded = this.loadLimit;
   usersOrder = "1";
-
-  sort$: BehaviorSubject<string>;
-  numUsersLoaded$: BehaviorSubject<number>;
-  lastUserId$: BehaviorSubject<number>;
+  pageCounter = 1;
+  loadLimit = 3;
 
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
     private router: Router,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private storage: StorageService
   ) {
-    this.sort$ = new BehaviorSubject(this.usersOrder);
-    this.numUsersLoaded$ = new BehaviorSubject(this.loadLimit);
-    this.lastUserId$ = new BehaviorSubject(0);
     this.users$ = new BehaviorSubject<IUser[]>([]);
     this.users2$ = new Observable<IUser[]>();
-    this.page$ = new BehaviorSubject(this.pageCounter);
   }
 
   ngOnInit(): void {
-    /*this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.users = users
-        console.log(this.users)
-      }
-    })
-    //Works with the following condition:
-    //let user of users | slice:0:numUsersLoaded
-    
-    this.userService.getUsersSorted(this.sort$, this.numUsersLoaded$).subscribe(docs => {
-      this.users = []
-
-      docs.forEach(doc => {
-        this.users.push(doc.data())
-      })
-    })
-    */
-
-    // this.userService
-    //   .getUsersSorted(
-    //     this.sort$,
-    //     this.numUsersLoaded$,
-    //     this.loadLimit,
-    //     this.lastUserId$
-    //   )
-    //   .subscribe((docs) => {
-    //     docs.forEach((doc) => {
-    //       this.users.push(doc.data());
-    //       this.users$.next(this.users);
-    //     });
-    //   });
-
-    // this.users2$ = this.userService.getUsers(
-    //   this.sort$,
-    //   this.page$,
-    //   this.loadLimit
-    // );
+    console.log(this.storage.items$);
 
     this.users2$ = this.route.queryParams.pipe(
       switchMap((params) => {
@@ -109,21 +62,7 @@ export class UsersListComponent implements OnInit {
     });
   }
 
-  // onScroll() {
-  //   this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id);
-  //   this.numUsersLoaded += 6;
-  //   this.numUsersLoaded$.next(this.numUsersLoaded);
-  // }
-
-  // loadMore() {
-  //   this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id);
-  //   this.numUsersLoaded += 6;
-  //   this.numUsersLoaded$.next(this.numUsersLoaded);
-  // }
-
   sort($event: Event) {
-    this.users = [];
-    this.users$.next(this.users);
     const { value } = $event.target as HTMLSelectElement;
     this.router.navigate([], {
       relativeTo: this.route,
@@ -132,14 +71,10 @@ export class UsersListComponent implements OnInit {
         page: 1,
       },
     });
-    this.numUsersLoaded = this.loadLimit;
-    this.numUsersLoaded$.next(this.numUsersLoaded);
-    this.lastUserId$.next(0);
   }
 
   nextPage() {
     this.pageCounter += 1;
-    this.page$.next(this.pageCounter);
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
@@ -151,7 +86,6 @@ export class UsersListComponent implements OnInit {
 
   prevPage() {
     this.pageCounter -= 1;
-    this.page$.next(this.pageCounter);
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
@@ -163,15 +97,6 @@ export class UsersListComponent implements OnInit {
 
   async deleteUser(user: IUser) {
     await this.userService.deleteUser(user);
-    this.page$.next(this.pageCounter);
-
-    // this.users.forEach((u, i) => {
-    //   if (u.id === user.id) {
-    //     this.users.splice(i, 1);
-    //     this.numUsersLoaded -= 1;
-    //   }
-    // });
-    // this.users$.next(this.users);
   }
 
   addUser(user: IUser) {
@@ -182,17 +107,9 @@ export class UsersListComponent implements OnInit {
         page: 1,
       },
     });
-    this.page$.next(this.pageCounter);
-    // if (this.usersOrder === "1") {
-    //   this.users.unshift(user);
-    //   this.numUsersLoaded += 1;
-    //   this.users$.next(this.users);
-    // }
   }
 
   updateUser(user: IUser) {
-    this.page$.next(this.pageCounter);
-
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
@@ -200,13 +117,6 @@ export class UsersListComponent implements OnInit {
         page: this.pageCounter,
       },
     });
-    // const oldUser = this.users.find((u) => u.id === user.id);
-
-    // if (oldUser) {
-    //   const oldUserIndex = this.users.indexOf(oldUser);
-    //   this.users[oldUserIndex] = user;
-    //   this.users$.next(this.users);
-    // }
   }
 
   trackByFn(index: number, item: IUser) {

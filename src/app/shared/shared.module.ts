@@ -1,24 +1,21 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ModalComponent } from './modal/modal.component';
-import { InputComponent } from './input/input.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { ReactiveFormsModule } from '@angular/forms';
-import { InputDateComponent } from './input-date/input-date.component';
-import { InputSelectComponent } from './input-select/input-select.component';
-import { MatSelectModule } from '@angular/material/select';
-import { AlertComponent } from './alert/alert.component';
-
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { InputComponent } from "./input/input.component";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { ReactiveFormsModule } from "@angular/forms";
+import { InputDateComponent } from "./input-date/input-date.component";
+import { InputSelectComponent } from "./input-select/input-select.component";
+import { MatSelectModule } from "@angular/material/select";
+import { AlertComponent } from "./alert/alert.component";
 
 @NgModule({
   declarations: [
-    ModalComponent,
     InputComponent,
     InputDateComponent,
     InputSelectComponent,
-    AlertComponent
+    AlertComponent,
   ],
   imports: [
     CommonModule,
@@ -26,14 +23,13 @@ import { AlertComponent } from './alert/alert.component';
     MatInputModule,
     MatDatepickerModule,
     MatSelectModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   exports: [
-    ModalComponent,
     InputComponent,
     InputDateComponent,
     InputSelectComponent,
-    AlertComponent
-  ]
+    AlertComponent,
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

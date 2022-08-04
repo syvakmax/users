@@ -6,10 +6,10 @@ import { IUser } from "../users/users";
   providedIn: "root",
 })
 export class StorageService {
-  private itemsBehaviour = new BehaviorSubject<IUser[]>([]);
+  private _itemsBehaviour = new BehaviorSubject<IUser[]>([]);
 
   get items$() {
-    return this.itemsBehaviour.asObservable();
+    return this._itemsBehaviour.asObservable();
   }
 
   constructor() {}

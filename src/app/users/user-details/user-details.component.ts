@@ -8,7 +8,6 @@ import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Params } from "@angular/router";
 import { Router } from "@angular/router";
 import { Observable, switchMap } from "rxjs";
-import { ModalService } from "src/app/services/modal.service";
 import { UserService } from "src/app/services/user.service";
 import { DeleteUserModalComponent } from "../delete-user-modal/delete-user-modal.component";
 import { EditUserModalComponent } from "../edit-user-modal/edit-user-modal.component";
@@ -28,7 +27,6 @@ export class UserDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
-    private modal: ModalService,
     private router: Router,
     public dialog: MatDialog //private cd: ChangeDetectorRef
   ) {}
