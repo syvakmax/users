@@ -5,7 +5,7 @@ import {
   OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Params, Router } from "@angular/router";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable, switchMap } from "rxjs";
 import { UserService } from "src/app/services/user.service";
 import { MatDialog } from "@angular/material/dialog";
 import { IUser } from "../users";
@@ -22,17 +22,18 @@ import { EditUserModalComponent } from "../edit-user-modal/edit-user-modal.compo
 export class UsersListComponent implements OnInit {
   users$: BehaviorSubject<IUser[]>;
 
+  users2$: Observable<IUser[]>;
+  page$: BehaviorSubject<number>;
+  pageCounter = 1;
+
   users: IUser[] = [];
-  loadLimit = 12;
+  loadLimit = 3;
   numUsersLoaded = this.loadLimit;
   usersOrder = "1";
-  activeUser: IUser | null = null;
 
   sort$: BehaviorSubject<string>;
   numUsersLoaded$: BehaviorSubject<number>;
   lastUserId$: BehaviorSubject<number>;
-
-  activeModal = "";
 
   constructor(
     private userService: UserService,
@@ -44,6 +45,8 @@ export class UsersListComponent implements OnInit {
     this.numUsersLoaded$ = new BehaviorSubject(this.loadLimit);
     this.lastUserId$ = new BehaviorSubject(0);
     this.users$ = new BehaviorSubject<IUser[]>([]);
+    this.users2$ = new Observable<IUser[]>();
+    this.page$ = new BehaviorSubject(this.pageCounter);
   }
 
   ngOnInit(): void {
@@ -65,37 +68,58 @@ export class UsersListComponent implements OnInit {
     })
     */
 
-    this.userService
-      .getUsersSorted(
-        this.sort$,
-        this.numUsersLoaded$,
-        this.loadLimit,
-        this.lastUserId$
-      )
-      .subscribe((docs) => {
-        docs.forEach((doc) => {
-          this.users.push(doc.data());
-          this.users$.next(this.users);
-        });
-      });
+    // this.userService
+    //   .getUsersSorted(
+    //     this.sort$,
+    //     this.numUsersLoaded$,
+    //     this.loadLimit,
+    //     this.lastUserId$
+    //   )
+    //   .subscribe((docs) => {
+    //     docs.forEach((doc) => {
+    //       this.users.push(doc.data());
+    //       this.users$.next(this.users);
+    //     });
+    //   });
 
-    this.route.queryParams.subscribe((params: Params) => {
-      this.usersOrder = params.sort === "2" ? "2" : "1";
-      this.sort$.next(this.usersOrder);
+    // this.users2$ = this.userService.getUsers(
+    //   this.sort$,
+    //   this.page$,
+    //   this.loadLimit
+    // );
+
+    this.users2$ = this.route.queryParams.pipe(
+      switchMap((params) => {
+        this.usersOrder = params.sort === "2" ? "2" : "1";
+        this.pageCounter = Number(params.page);
+        return this.userService.getUsers2(
+          this.usersOrder,
+          this.pageCounter,
+          this.loadLimit
+        );
+      })
+    );
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sort: this.usersOrder,
+        page: this.pageCounter,
+      },
     });
   }
 
-  onScroll() {
-    this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id);
-    this.numUsersLoaded += 6;
-    this.numUsersLoaded$.next(this.numUsersLoaded);
-  }
+  // onScroll() {
+  //   this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id);
+  //   this.numUsersLoaded += 6;
+  //   this.numUsersLoaded$.next(this.numUsersLoaded);
+  // }
 
-  loadMore() {
-    this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id);
-    this.numUsersLoaded += 6;
-    this.numUsersLoaded$.next(this.numUsersLoaded);
-  }
+  // loadMore() {
+  //   this.lastUserId$.next(this.users[this.numUsersLoaded - 1].id);
+  //   this.numUsersLoaded += 6;
+  //   this.numUsersLoaded$.next(this.numUsersLoaded);
+  // }
 
   sort($event: Event) {
     this.users = [];
@@ -105,6 +129,7 @@ export class UsersListComponent implements OnInit {
       relativeTo: this.route,
       queryParams: {
         sort: value,
+        page: 1,
       },
     });
     this.numUsersLoaded = this.loadLimit;
@@ -112,34 +137,76 @@ export class UsersListComponent implements OnInit {
     this.lastUserId$.next(0);
   }
 
-  deleteUser(user: IUser) {
-    this.userService.deleteUser(user);
-
-    this.users.forEach((u, i) => {
-      if (u.id === user.id) {
-        this.users.splice(i, 1);
-        this.numUsersLoaded -= 1;
-      }
+  nextPage() {
+    this.pageCounter += 1;
+    this.page$.next(this.pageCounter);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sort: this.usersOrder,
+        page: this.pageCounter,
+      },
     });
-    this.users$.next(this.users);
+  }
+
+  prevPage() {
+    this.pageCounter -= 1;
+    this.page$.next(this.pageCounter);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sort: this.usersOrder,
+        page: this.pageCounter,
+      },
+    });
+  }
+
+  async deleteUser(user: IUser) {
+    await this.userService.deleteUser(user);
+    this.page$.next(this.pageCounter);
+
+    // this.users.forEach((u, i) => {
+    //   if (u.id === user.id) {
+    //     this.users.splice(i, 1);
+    //     this.numUsersLoaded -= 1;
+    //   }
+    // });
+    // this.users$.next(this.users);
   }
 
   addUser(user: IUser) {
-    if (this.usersOrder === "1") {
-      this.users.unshift(user);
-      this.numUsersLoaded += 1;
-    }
-    this.users$.next(this.users);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sort: this.usersOrder,
+        page: 1,
+      },
+    });
+    this.page$.next(this.pageCounter);
+    // if (this.usersOrder === "1") {
+    //   this.users.unshift(user);
+    //   this.numUsersLoaded += 1;
+    //   this.users$.next(this.users);
+    // }
   }
 
   updateUser(user: IUser) {
-    const oldUser = this.users.find((u) => u.id === user.id);
+    this.page$.next(this.pageCounter);
 
-    if (oldUser) {
-      const oldUserIndex = this.users.indexOf(oldUser);
-      this.users[oldUserIndex] = user;
-      this.users$.next(this.users);
-    }
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sort: this.usersOrder,
+        page: this.pageCounter,
+      },
+    });
+    // const oldUser = this.users.find((u) => u.id === user.id);
+
+    // if (oldUser) {
+    //   const oldUserIndex = this.users.indexOf(oldUser);
+    //   this.users[oldUserIndex] = user;
+    //   this.users$.next(this.users);
+    // }
   }
 
   trackByFn(index: number, item: IUser) {
@@ -149,12 +216,15 @@ export class UsersListComponent implements OnInit {
   openDialogDelete(user: IUser) {
     let dialogRef = this.dialog.open(DeleteUserModalComponent);
 
-    const sub = dialogRef.componentInstance.deleteUser.subscribe(() => {
-      this.deleteUser(user);
-    });
+    // const sub = dialogRef.componentInstance.deleteUser.subscribe(() => {
+    //   this.deleteUser(user);
+    // });
 
-    dialogRef.afterClosed().subscribe(() => {
-      sub.unsubscribe();
+    dialogRef.afterClosed().subscribe((shouldDelete) => {
+      debugger;
+      if (shouldDelete) {
+        this.deleteUser(user);
+      }
     });
   }
 

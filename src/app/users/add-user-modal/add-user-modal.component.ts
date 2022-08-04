@@ -10,6 +10,8 @@ import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { AngularFirestore } from "@angular/fire/compat/firestore";
 import { users, IUser } from "../users";
 import { Router } from "@angular/router";
+import { Observable } from "rxjs";
+import { UserService } from "src/app/services/user.service";
 
 @Component({
   selector: "app-add-user-modal",
@@ -48,7 +50,11 @@ export class AddUserModalComponent implements OnInit, OnDestroy {
 
   isValid = false;
 
-  constructor(private db: AngularFirestore, private router: Router) {}
+  constructor(
+    private db: AngularFirestore,
+    private router: Router,
+    private userService: UserService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -78,6 +84,10 @@ export class AddUserModalComponent implements OnInit, OnDestroy {
     };
 
     try {
+      // let newID = await this.userService.getLastUserId();
+      // if (newID) {
+      //   newID++;
+      // }
       await this.db
         .collection("users")
         .doc(userID.toString())

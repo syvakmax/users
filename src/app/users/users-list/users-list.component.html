@@ -15,15 +15,18 @@
     </div>
   </div>
 
-  <div
+  <!-- <div
     infiniteScroll
     [infiniteScrollDistance]="2"
     [infiniteScrollThrottle]="50"
     (scrolled)="onScroll()"
     class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+  >-->
+  <div
+    class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
   >
     <app-user-card
-      *ngFor="let user of users$ | async; trackBy: trackByFn"
+      *ngFor="let user of users2$ | async; trackBy: trackByFn"
       [user]="user"
       (editUser)="openDialogEdit(user)"
       (deleteUser)="openDialogDelete(user)"
@@ -31,10 +34,22 @@
     </app-user-card>
   </div>
 
-  <div class="text-center my-4">
-    <button mat-raised-button color="primary" (click)="loadMore()">
-      Load more
-    </button>
+  <div class="flex justify-center space-x-4">
+    <div class="text-center my-4">
+      <button
+        *ngIf="pageCounter !== 1"
+        mat-raised-button
+        color="primary"
+        (click)="prevPage()"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+    <div class="text-center my-4">
+      <button mat-raised-button color="primary" (click)="nextPage()">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
   </div>
 
   <div class="sticky bottom-10 float-right mr-4 z-100">
@@ -48,8 +63,3 @@
     </button>
   </div>
 </section>
-
-<!--<app-edit-user-modal
-  [activeUser]="activeUser"
-  (editUser)="updateUser($event)"
-></app-edit-user-modal>-->

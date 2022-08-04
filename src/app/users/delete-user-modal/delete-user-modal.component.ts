@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "app-delete-user-modal",
@@ -8,7 +9,11 @@ import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 export class DeleteUserModalComponent implements OnInit {
   @Output() deleteUser = new EventEmitter();
 
-  constructor() {}
+  constructor(public dialogRef: MatDialogRef<DeleteUserModalComponent>) {}
 
   ngOnInit(): void {}
+
+  closeDialog(shouldDelete: boolean) {
+    this.dialogRef.close(shouldDelete);
+  }
 }
