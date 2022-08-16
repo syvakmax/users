@@ -2,10 +2,18 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Params, Router } from "@angular/router";
-import { BehaviorSubject, Observable, switchMap } from "rxjs";
+import {
+  BehaviorSubject,
+  map,
+  Observable,
+  Subscription,
+  switchMap,
+  tap,
+} from "rxjs";
 import { UserService } from "src/app/services/user.service";
 import { MatDialog } from "@angular/material/dialog";
 import { IUser } from "../users";
@@ -20,12 +28,12 @@ import { StorageService } from "src/app/services/storage.service";
   styleUrls: ["./users-list.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersListComponent implements OnInit {
-  users$: BehaviorSubject<IUser[]>;
-  users2$: Observable<IUser[]>;
+export class UsersListComponent implements OnInit, OnDestroy {
+  users$: Observable<IUser[]>;
   usersOrder = "1";
   pageCounter = 1;
-  loadLimit = 3;
+  loadLimit = 9;
+  sub$!: Subscription;
 
   constructor(
     private userService: UserService,
@@ -34,32 +42,28 @@ export class UsersListComponent implements OnInit {
     public dialog: MatDialog,
     private storage: StorageService
   ) {
-    this.users$ = new BehaviorSubject<IUser[]>([]);
-    this.users2$ = new Observable<IUser[]>();
+    this.users$ = new Observable<IUser[]>();
   }
 
   ngOnInit(): void {
-    console.log(this.storage.items$);
+    //this.users$ = this.storage.items$;
+    this.users$ = this.storage.itemsList$;
 
-    this.users2$ = this.route.queryParams.pipe(
-      switchMap((params) => {
-        this.usersOrder = params.sort === "2" ? "2" : "1";
-        this.pageCounter = Number(params.page);
-        return this.userService.getUsers2(
-          this.usersOrder,
-          this.pageCounter,
-          this.loadLimit
-        );
-      })
-    );
+    this.sub$ = this.route.queryParams
+      .pipe(
+        tap((params) => {
+          this.usersOrder = params.sort === "2" ? "2" : "1";
+          this.pageCounter = Number(params.page ? params.page : 1);
+          this.storage.setSort(this.usersOrder);
+          this.storage.setPage(this.pageCounter);
+          // this.storage.requestData(this.loadLimit);
+        })
+      )
+      .subscribe();
+  }
 
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        sort: this.usersOrder,
-        page: this.pageCounter,
-      },
-    });
+  ngOnDestroy() {
+    this.sub$.unsubscribe();
   }
 
   sort($event: Event) {
@@ -97,26 +101,25 @@ export class UsersListComponent implements OnInit {
 
   async deleteUser(user: IUser) {
     await this.userService.deleteUser(user);
+    //this.storage.requestData(this.loadLimit);
   }
 
-  addUser(user: IUser) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        sort: this.usersOrder,
-        page: 1,
-      },
-    });
+  addUser() {
+    if (this.pageCounter === 1) {
+      // this.storage.requestData(this.loadLimit);
+    } else {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          sort: this.usersOrder,
+          page: 1,
+        },
+      });
+    }
   }
 
   updateUser(user: IUser) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        sort: this.usersOrder,
-        page: this.pageCounter,
-      },
-    });
+    // this.storage.requestData(this.loadLimit);
   }
 
   trackByFn(index: number, item: IUser) {
@@ -131,7 +134,7 @@ export class UsersListComponent implements OnInit {
     // });
 
     dialogRef.afterClosed().subscribe((shouldDelete) => {
-      debugger;
+      //debugger;
       if (shouldDelete) {
         this.deleteUser(user);
       }
@@ -141,15 +144,10 @@ export class UsersListComponent implements OnInit {
   openDialogAdd() {
     let dialogRef = this.dialog.open(AddUserModalComponent);
 
-    const sub = dialogRef.componentInstance.newUser.subscribe((user) => {
-      this.addUser(user);
-      setTimeout(() => {
-        dialogRef.close();
-      }, 1000);
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      sub.unsubscribe();
+    dialogRef.afterClosed().subscribe((userAdded) => {
+      if (userAdded) {
+        this.addUser();
+      }
     });
   }
 
@@ -157,7 +155,6 @@ export class UsersListComponent implements OnInit {
     let dialogRef = this.dialog.open(EditUserModalComponent, {
       data: user,
     });
-
     const sub = dialogRef.componentInstance.updatedUser.subscribe((user) => {
       this.updateUser(user);
       setTimeout(() => {

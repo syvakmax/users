@@ -3,6 +3,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./home/home.component";
 import { NotFoundComponent } from "./not-found/not-found.component";
+import { TopDomainsComponent } from "./users/top-domains/top-domains.component";
 import { UserDetailsComponent } from "./users/user-details/user-details.component";
 
 const routes: Routes = [
@@ -18,6 +19,10 @@ const routes: Routes = [
   {
     path: "user/:id",
     component: UserDetailsComponent,
+  },
+  {
+    path: "top-domains",
+    component: TopDomainsComponent,
   },
   { path: "**", component: NotFoundComponent },
 ];

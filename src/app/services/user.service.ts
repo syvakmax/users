@@ -141,31 +141,7 @@ export class UserService {
     );
   }
 
-  getUsers(
-    sort$: BehaviorSubject<string>,
-    page$: BehaviorSubject<number>,
-    loadLimit: number
-  ) {
-    return combineLatest([sort$, page$]).pipe(
-      switchMap((values) => {
-        const [sort, page] = values;
-        const query = this.usersCollection.ref
-          .orderBy("id", sort === "1" ? "desc" : "asc")
-          .limit(page * loadLimit);
-        return query.get();
-      }),
-      map((snap) => {
-        return (snap as QuerySnapshot<IUser>).docs;
-      }),
-      map((docs) => {
-        let users: IUser[] = [];
-        docs.forEach((doc) => users.push(doc.data()));
-        return users.slice(-loadLimit);
-      })
-    );
-  }
-
-  getUsers2(sort: string, page: number, loadLimit: number) {
+  getUsers(sort: string, page: number, loadLimit: number) {
     const query = this.usersCollection.ref
       .orderBy("id", sort === "1" ? "desc" : "asc")
       .limit(page * loadLimit);
@@ -212,5 +188,68 @@ export class UserService {
 
   async deleteUser(user: IUser) {
     await this.usersCollection.doc(user.id.toString()).delete();
+  }
+
+  getUsers2(sort: string, page: number, loadLimit: number) {
+    let lastUserId = this.getLastUserId2();
+
+    const x = from(lastUserId).pipe(
+      map((id) => {
+        return id;
+      })
+    );
+
+    let query = this.usersCollection.ref
+      .orderBy("id", "asc")
+      .startAt((page - 1) * loadLimit + 1)
+      .limit(loadLimit);
+    if (sort === "1") {
+      this.getLastUserId()
+        .then((res) => {
+          if (res) {
+            let query = this.usersCollection.ref
+              .orderBy("id", "desc")
+              .endAt(500 - loadLimit * page)
+              .limit(loadLimit);
+          }
+          return query;
+        })
+        .then((query) => {
+          const res = from(query.get()).pipe(
+            map((snap) => {
+              return (snap as QuerySnapshot<IUser>).docs;
+            }),
+            map((docs) => {
+              let users: IUser[] = [];
+              docs.forEach((doc) => users.push(doc.data()));
+              return users.slice(-loadLimit);
+            })
+          );
+          return res;
+        })
+        .catch((err) => console.error(err));
+    }
+    const res = from(query.get()).pipe(
+      map((snap) => {
+        return (snap as QuerySnapshot<IUser>).docs;
+      }),
+      map((docs) => {
+        let users: IUser[] = [];
+        docs.forEach((doc) => users.push(doc.data()));
+        return users.slice(-loadLimit);
+      })
+    );
+    return res;
+  }
+
+  async getLastUserId2() {
+    const query = this.usersCollection.ref.orderBy("id", "desc").limit(1);
+    const querySnapshot = await query.get();
+    let id = 0;
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      id = doc.data().id;
+    });
+    return id;
   }
 }

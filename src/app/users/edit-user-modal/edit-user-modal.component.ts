@@ -10,7 +10,7 @@ import { IUser } from "../users";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { UserService } from "src/app/services/user.service";
 import { Router } from "@angular/router";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 @Component({
   selector: "app-edit-user-modal",
@@ -54,7 +54,8 @@ export class EditUserModalComponent implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-    @Inject(MAT_DIALOG_DATA) public activeUser: IUser
+    @Inject(MAT_DIALOG_DATA) public activeUser: IUser,
+    private dialogRef: MatDialogRef<EditUserModalComponent>
   ) {}
 
   ngOnInit(): void {
@@ -102,8 +103,9 @@ export class EditUserModalComponent implements OnInit {
     this.updatedUser.emit(updatedUser);
 
     setTimeout(() => {
+      this.dialogRef.close();
       this.showAlert = false;
-    }, 2000);
+    }, 1000);
 
     // setTimeout(() => {
     //   this.router.navigate(['user', updatedUser.id])

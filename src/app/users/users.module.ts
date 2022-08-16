@@ -19,6 +19,7 @@ import { EditUserModalComponent } from "./edit-user-modal/edit-user-modal.compon
 import { InfiniteScrollModule } from "ngx-infinite-scroll";
 import { UserCardComponent } from "./user-card/user-card.component";
 import { DeleteUserModalComponent } from "./delete-user-modal/delete-user-modal.component";
+import { TopDomainsComponent } from './top-domains/top-domains.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { DeleteUserModalComponent } from "./delete-user-modal/delete-user-modal.
     EditUserModalComponent,
     UserCardComponent,
     DeleteUserModalComponent,
+    TopDomainsComponent,
   ],
   imports: [
     RouterModule,

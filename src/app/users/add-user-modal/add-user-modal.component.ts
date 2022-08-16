@@ -12,6 +12,7 @@ import { users, IUser } from "../users";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { UserService } from "src/app/services/user.service";
+import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "app-add-user-modal",
@@ -20,9 +21,10 @@ import { UserService } from "src/app/services/user.service";
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class AddUserModalComponent implements OnInit, OnDestroy {
-  @Output() newUser = new EventEmitter<IUser>();
+  @Output() userAdded = new EventEmitter();
 
   users = users;
+  counter = 0;
 
   firstName = new FormControl("", [
     Validators.required,
@@ -52,6 +54,7 @@ export class AddUserModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private db: AngularFirestore,
+    private dialogRef: MatDialogRef<AddUserModalComponent>,
     private router: Router,
     private userService: UserService
   ) {}
@@ -64,33 +67,35 @@ export class AddUserModalComponent implements OnInit, OnDestroy {
   showAlert = false;
   alertColor = "blue";
   alertMsg = "Adding a new user";
-  closeDialog = false;
 
   async addNewUser() {
     this.inSubmission = true;
     this.showAlert = true;
     this.alertColor = "blue";
     this.alertMsg = "Adding a new user";
-    const timestamp = Date();
-    const userID = Date.parse(timestamp);
-
-    const newUser: IUser = {
-      id: userID,
-      firstName: this.firstName.value as string,
-      lastName: this.lastName.value as string,
-      email: this.email.value as string,
-      birthDate: this.birthDate.value as string,
-      role: this.role.value as string,
-    };
+    //const timestamp = Date();
+    //const userID = Date.parse(timestamp);
 
     try {
-      // let newID = await this.userService.getLastUserId();
-      // if (newID) {
-      //   newID++;
-      // }
+      const lastUserId = await this.userService.getLastUserId();
+      if (!lastUserId) {
+        this.inSubmission = false;
+        this.alertColor = "red";
+        this.alertMsg = "An unexpected error occured. Please try again later";
+        throw new Error("Failed to retrieve an ID");
+      }
+      let newID = lastUserId + 1;
+      const newUser: IUser = {
+        id: newID,
+        firstName: this.firstName.value as string,
+        lastName: this.lastName.value as string,
+        email: this.email.value as string,
+        birthDate: this.birthDate.value as string,
+        role: this.role.value as string,
+      };
       await this.db
         .collection("users")
-        .doc(userID.toString())
+        .doc(newID.toString())
         .set({
           ...newUser,
         });
@@ -105,22 +110,23 @@ export class AddUserModalComponent implements OnInit, OnDestroy {
     this.inSubmission = false;
     this.alertColor = "green";
     this.alertMsg = "Success! New user has been added";
+    setTimeout(() => this.closeDialog(true));
 
-    this.newUser.emit(newUser);
-
-    // setTimeout(() => {
-    //   this.modal.toggleModal("add-user");
-    // }, 1000);
     // setTimeout(() => {
     //   this.router.navigate(["user", userID]);
     // }, 1200);
   }
 
+  closeDialog(userAdded: boolean) {
+    this.dialogRef.close(userAdded);
+  }
+
   pushUsers() {
     this.users.forEach(async (user, i) => {
       try {
-        const timestamp = Date();
-        const userID = Date.parse(timestamp) + i;
+        //const timestamp = Date();
+        this.counter++;
+        const userID = this.counter;
         await this.db.collection("users").doc(userID.toString()).set({
           id: userID,
           firstName: user.firstName,
