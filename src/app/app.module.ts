@@ -1,20 +1,23 @@
-import { NgModule } from "@angular/core";
-import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
-import { AppRoutingModule } from "./app-routing.module";
-import { AppComponent } from "./app.component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatToolbarModule } from "@angular/material/toolbar";
-import { MatButtonModule } from "@angular/material/button";
-import { UsersModule } from "./users/users.module";
-import { SharedModule } from "./shared/shared.module";
-import { HomeComponent } from "./home/home.component";
-import { NavComponent } from "./nav/nav.component";
-import { NotFoundComponent } from "./not-found/not-found.component";
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { UsersModule } from './users/users.module';
+import { SharedModule } from './shared/shared.module';
+import { HomeComponent } from './home/home.component';
+import { NavComponent } from './nav/nav.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
-import { AngularFireModule } from "@angular/fire/compat";
-import { AngularFirestoreModule } from "@angular/fire/compat/firestore";
-import { environment } from "src/environments/environment";
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { environment } from 'src/environments/environment';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { UserState } from './+state/user.state';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, NavComponent, NotFoundComponent],
@@ -28,6 +31,10 @@ import { environment } from "src/environments/environment";
     MatButtonModule,
     UsersModule,
     SharedModule,
+    NgxsModule.forRoot([UserState], {
+      developmentMode: true,
+    }),
+    NgxsReduxDevtoolsPluginModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],

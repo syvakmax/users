@@ -34,6 +34,36 @@
     </app-user-card>
   </div>
 
+  <hr>
+
+  <h2>State</h2>
+  <div
+    class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+  >
+    <app-user-card
+      *ngFor="let user of users_new$ | async; trackBy: trackByFn"
+      [user]="user"
+      (editUser)="openDialogEdit(user)"
+      (deleteUser)="openDialogDelete(user)"
+    >
+    </app-user-card>
+  </div>
+
+
+  <h2>State</h2>
+  <div
+    class="grid grid-flow-row-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+  >
+    <app-user-card
+      *ngFor="let user of users_new2$ | async; trackBy: trackByFn"
+      [user]="user"
+      (editUser)="openDialogEdit(user)"
+      (deleteUser)="openDialogDelete(user)"
+    >
+    </app-user-card>
+  </div>
+
+
   <div class="flex justify-center space-x-4">
     <div class="text-center my-4">
       <button

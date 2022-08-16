@@ -4,8 +4,8 @@ import {
   Component,
   OnDestroy,
   OnInit,
-} from "@angular/core";
-import { ActivatedRoute, Params, Router } from "@angular/router";
+} from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   BehaviorSubject,
   map,
@@ -13,24 +13,29 @@ import {
   Subscription,
   switchMap,
   tap,
-} from "rxjs";
-import { UserService } from "src/app/services/user.service";
-import { MatDialog } from "@angular/material/dialog";
-import { IUser } from "../users";
-import { DeleteUserModalComponent } from "../delete-user-modal/delete-user-modal.component";
-import { AddUserModalComponent } from "../add-user-modal/add-user-modal.component";
-import { EditUserModalComponent } from "../edit-user-modal/edit-user-modal.component";
-import { StorageService } from "src/app/services/storage.service";
+} from 'rxjs';
+import { UserService } from 'src/app/services/user.service';
+import { MatDialog } from '@angular/material/dialog';
+import { IUser } from '../users';
+import { DeleteUserModalComponent } from '../delete-user-modal/delete-user-modal.component';
+import { AddUserModalComponent } from '../add-user-modal/add-user-modal.component';
+import { EditUserModalComponent } from '../edit-user-modal/edit-user-modal.component';
+import { StorageService } from 'src/app/services/storage.service';
+import { Store } from '@ngxs/store';
+import { UserState } from 'src/app/+state/user.state';
+import { SetOrder, SetPage } from 'src/app/+state/user.actions';
 
 @Component({
-  selector: "app-users-list",
-  templateUrl: "./users-list.component.html",
-  styleUrls: ["./users-list.component.css"],
+  selector: 'app-users-list',
+  templateUrl: './users-list.component.html',
+  styleUrls: ['./users-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersListComponent implements OnInit, OnDestroy {
   users$: Observable<IUser[]>;
-  usersOrder = "1";
+  users_new$: Observable<IUser[]>;
+  users_new2$: Observable<IUser[]>;
+  usersOrder = '1';
   pageCounter = 1;
   loadLimit = 9;
   sub$!: Subscription;
@@ -40,9 +45,12 @@ export class UsersListComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     public dialog: MatDialog,
-    private storage: StorageService
+    private storage: StorageService,
+    private store: Store
   ) {
     this.users$ = new Observable<IUser[]>();
+    this.users_new$ = store.select(UserState.getItems);
+    this.users_new2$ = store.select(UserState.getItems);
   }
 
   ngOnInit(): void {
@@ -52,10 +60,12 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.sub$ = this.route.queryParams
       .pipe(
         tap((params) => {
-          this.usersOrder = params.sort === "2" ? "2" : "1";
+          this.usersOrder = params.sort === '2' ? '2' : '1';
           this.pageCounter = Number(params.page ? params.page : 1);
           this.storage.setSort(this.usersOrder);
+          this.store.dispatch(new SetOrder(this.usersOrder));
           this.storage.setPage(this.pageCounter);
+          this.store.dispatch(new SetPage(this.pageCounter));
           // this.storage.requestData(this.loadLimit);
         })
       )
@@ -81,8 +91,8 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.pageCounter += 1;
     this.router.navigate([], {
       relativeTo: this.route,
+      queryParamsHandling: 'merge',
       queryParams: {
-        sort: this.usersOrder,
         page: this.pageCounter,
       },
     });
